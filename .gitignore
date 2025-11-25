@@ -1,0 +1,7 @@
+#Playwright
+node_modules/
+tes_results/
+allure_report/
+allure_results/
+Playwright_report/
+
