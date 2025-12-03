@@ -5,7 +5,7 @@ import { test, expect } from '../fixtures/basefixtures';
 
 
 
-test('verify valid login', async ({ homePage }) => {
+test(' @register verify valid login', async ({ homePage }) => {
  
     await expect(homePage.page).toHaveTitle('My Account');
 

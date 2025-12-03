@@ -24,3 +24,5 @@ export class ResultsPage {
         return new ProductInfoPage(this.page);
     }
 }
+
+

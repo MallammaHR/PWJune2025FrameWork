@@ -38,7 +38,7 @@ export class HomePage{
         return new LoginPage(this.page);
     }
 
-    async doSearch(searchKey: string) {
+    async doSearch(searchKey: string) :Promise<ResultsPage>{
         console.log(`search key : ${searchKey}`);
         await this.eleUtil.fill(this.search, searchKey);
         await this.eleUtil.click(this.searchIcon);
