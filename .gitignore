@@ -1,7 +1,12 @@
 #Playwright
 node_modules/
-tes-results/
-allure-report/
-allure-results/
-Playwright-report/
+/tes-results/
+/allure-report/
+/allure-results/
+/playwright-report/
+/playwright/.auth/
+/playwright/.cache/
+/playwright-html-report/
+/blob-report/
+
 
