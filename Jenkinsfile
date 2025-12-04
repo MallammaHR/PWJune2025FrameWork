@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // PLAYWRIGHT AUTO PIPELINE - JENKINSFILE
 // ============================================
 // Flow: lint → dev → qa → stage → prod (automatic)
@@ -52,20 +52,20 @@ pipeline {
         // ============================================
         // Static Code Analysis (ESLint)
         // ============================================
-        stage('ESLint Analysis') {
+        stage('🔍 ESLint Analysis') {
             steps {
                 echo '============================================'
-                echo 'Installing dependencies...'
+                echo '📥 Installing dependencies...'
                 echo '============================================'
                 sh 'npm ci'
 
                 echo '============================================'
-                echo 'Creating ESLint report directory...'
+                echo '📁 Creating ESLint report directory...'
                 echo '============================================'
                 sh 'mkdir -p eslint-report'
 
                 echo '============================================'
-                echo ' Running ESLint...'
+                echo '🔍 Running ESLint...'
                 echo '============================================'
                 script {
                     def eslintStatus = sh(script: 'npm run lint', returnStatus: true)
@@ -92,7 +92,7 @@ pipeline {
                         if (env.ESLINT_STATUS == 'failure') {
                             echo '⚠️ ESLint found issues - check the HTML report'
                         } else {
-                            echo ' No ESLint issues found'
+                            echo '✅ No ESLint issues found'
                         }
                     }
                 }
@@ -125,7 +125,7 @@ pipeline {
                 }
 
                 echo '============================================'
-                echo 'Adding Allure environment info...'
+                echo '🏷️ Adding Allure environment info...'
                 echo '============================================'
                 sh '''
                     mkdir -p allure-results
@@ -183,7 +183,7 @@ pipeline {
         // ============================================
         // QA Environment Tests
         // ============================================
-        stage(' QA Tests') {
+        stage('🔍 QA Tests') {
             steps {
                 echo '============================================'
                 echo '🧹 Cleaning previous results...'
@@ -259,7 +259,7 @@ pipeline {
         // ============================================
         // STAGE Environment Tests
         // ============================================
-        stage(' STAGE Tests') {
+        stage('🎯 STAGE Tests') {
             steps {
                 echo '============================================'
                 echo '🧹 Cleaning previous results...'
@@ -267,7 +267,7 @@ pipeline {
                 sh 'rm -rf allure-results playwright-report playwright-html-report test-results'
 
                 echo '============================================'
-                echo ' Running STAGE tests...'
+                echo '🧪 Running STAGE tests...'
                 echo '============================================'
                 script {
                     env.STAGE_TEST_STATUS = sh(
@@ -335,7 +335,7 @@ pipeline {
         // ============================================
         // PROD Environment Tests
         // ============================================
-        stage(' PROD Tests') {
+        stage('🚀 PROD Tests') {
             steps {
                 echo '============================================'
                 echo '🧹 Cleaning previous results...'
@@ -411,7 +411,7 @@ pipeline {
         // ============================================
         // Generate Combined Allure Report (All Environments)
         // ============================================
-        stage('Combined Allure Report') {
+        stage('📈 Combined Allure Report') {
             steps {
                 echo '============================================'
                 echo '📊 Generating Combined Allure Report...'
@@ -455,7 +455,7 @@ pipeline {
     post {
         always {
             echo '============================================'
-            echo ' PIPELINE SUMMARY'
+            echo '📬 PIPELINE SUMMARY'
             echo '============================================'
 
             script {
@@ -505,7 +505,7 @@ ${prodEmoji} PROD:  ${prodStatus}
         }
 
         success {
-            echo ' Pipeline completed successfully!'
+            echo '✅ Pipeline completed successfully!'
 
             script {
                 // Slack notification
