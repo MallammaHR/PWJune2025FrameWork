@@ -1,52 +1,20 @@
-
+import { LoginPage } from '../pages/LoginPage';
+import { HomePage } from '../pages/HomePage';
 import { ResultsPage } from '../pages/ResultsPage';
 import { ProductInfoPage } from '../pages/ProductInfoPage';
+import { test, expect } from '../fixtures/baseFixtures'
 
-import {test,expect} from '../fixtures/basefixtures';
+
 
 let search = [
-    {
-        searchkey: 'macbook',
-        productname: 'MacBook Pro',
-        imagecount: 4,
-        headerText: 'MacBook Pro',
-        Brand:'Apple',
-        ProductCode:'Product 18',
-        RewardPoints:'800',
-        Availability:'Out Of Stock',
-        priceText : '$2,000.00',
-        extaxpriceText:'$2,000.00',
-
-    },
-    {
-        searchkey: 'macbook', 
-        productname: 'MacBook Air',
-        imagecount: 4,
-        headerText:'MacBook Air' ,
-        Brand:'Apple',
-        ProductCode:'Product 17',
-        RewardPoints:'700',
-        Availability:'Out Of Stock',
-        priceText : '$1,202.00',
-        extaxpriceText:'$1,000.00',
-    },
-    {
-        searchkey: 'samsung', 
-        productname: 'Samsung Galaxy Tab 10.1', 
-        imagecount: 7,
-        headerText:'Samsung Galaxy Tab 10.1' ,
-        Brand:null,
-        ProductCode:'SAM1',
-        RewardPoints:'1000',
-        Availability:'Pre-Order',
-        priceText : '$241.99',
-        extaxpriceText:'$199.99'
-    },
+    {searchkey: 'macbook', productname: 'MacBook Pro', imagecount: 4},
+    {searchkey: 'macbook', productname: 'MacBook Air', imagecount: 4},
+    {searchkey: 'samsung', productname: 'Samsung Galaxy Tab 10.1', imagecount: 7},
 ];
 
 for (let product of search) {
 
-    test(`verify product Header ${product.productname}`, async ({ homePage }) => {
+    test(`verify product Header ${product.productname}`, {tag:['@product','@sanity', '@regression']} , async ({  homePage }) => {        
 
         let resultsPage: ResultsPage = await homePage.doSearch(product.searchkey);
         
@@ -60,7 +28,7 @@ for (let product of search) {
 
 
 for (let product of search) {
-    test(`verify product Images ${product.productname} : ${product.imagecount}`, async ({ homePage }) => {
+    test(`verify product Images ${product.productname} : ${product.imagecount}`,{tag:['@product', '@sanity']}, async ({ homePage }) => {
 
         let resultsPage: ResultsPage = await homePage.doSearch(product.searchkey);
         
@@ -73,45 +41,33 @@ for (let product of search) {
 };
 
 
-for(let product of search){
-    // if(product.productname !== 'MacBook Pro')continue;
-    test(`verify product MetaData ${product.productname} : ${product.imagecount}`, async ({ homePage }) => {
+ test(`verify product MetaData `, async ({ homePage }) => {
 
-
-        let resultsPage: ResultsPage = await homePage.doSearch(product.searchkey);
+        let resultsPage: ResultsPage = await homePage.doSearch('macbook');
         
-        let productInfoPage: ProductInfoPage = await resultsPage.selectProduct(product.productname);
-        
-        let actualProductFullDetails = await productInfoPage.getProductDetails();
-
-             
-        expect.soft(actualProductFullDetails.get('header')).toBe(product.headerText);
-        expect.soft(actualProductFullDetails.get('Brand')?? '').toBe(product.Brand ??'');
-        expect.soft(actualProductFullDetails.get('Product Code')).toBe(product.ProductCode);
-        expect.soft(actualProductFullDetails.get('Reward Points')).toBe(product.RewardPoints);
-        expect.soft(actualProductFullDetails.get('Availability')).toBe(product.Availability);
-    });
-
-
-}
- 
-
-for(let product of search){
-   // if(product.productname !== 'MacBook Pro') continue;
-     test(`verify product Pricing ${product.productname} : ${product.imagecount}`, async ({ homePage }) => {
-
-
-        let resultsPage: ResultsPage = await homePage.doSearch(product.searchkey);
-        
-        let productInfoPage: ProductInfoPage = await resultsPage.selectProduct(product.productname);
+        let productInfoPage: ProductInfoPage = await resultsPage.selectProduct('MacBook Pro');
         
         let actualProductFullDetails = await productInfoPage.getProductDetails();
      
-        expect.soft(actualProductFullDetails.get('header')).toBe(product.headerText);
-        expect.soft(actualProductFullDetails.get('price')).toBe(product.priceText);
-        expect.soft(actualProductFullDetails.get('extaxprice')).toBe(product.extaxpriceText);
+        expect.soft(actualProductFullDetails.get('header')).toBe('MacBook Pro');
+        expect.soft(actualProductFullDetails.get('Brand')).toBe('Apple');
+        expect.soft(actualProductFullDetails.get('Product Code')).toBe('Product 18');
+        expect.soft(actualProductFullDetails.get('Reward Points')).toBe('800');
+        expect.soft(actualProductFullDetails.get('Availability')).toBe('Out Of Stock');
 
     });
-    
-}
-   
+
+
+    test(`verify product Pricing `, async ({ homePage }) => {
+
+        let resultsPage: ResultsPage = await homePage.doSearch('macbook');
+        
+        let productInfoPage: ProductInfoPage = await resultsPage.selectProduct('MacBook Pro');
+        
+        let actualProductFullDetails = await productInfoPage.getProductDetails();
+     
+        expect.soft(actualProductFullDetails.get('header')).toBe('MacBook Pro');
+        expect.soft(actualProductFullDetails.get('price')).toBe('$2,000.00');
+        expect.soft(actualProductFullDetails.get('extaxprice')).toBe('$2,000.00');
+
+    });

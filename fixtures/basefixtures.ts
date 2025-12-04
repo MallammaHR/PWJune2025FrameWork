@@ -1,35 +1,32 @@
-import {test as base ,expect} from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 
- 
+
 
 type MyFixtures = {
-
-    homePage : HomePage;
-
+    homePage: HomePage;
 };
 
 export const test = base.extend<MyFixtures>({
+    homePage: async ({ page, baseURL }, use, testInfo) => {
+        
+        const loginPage = new LoginPage(page);
+        await loginPage.goToLoginPage(baseURL);
 
-homePage : async({page,baseURL},use,testInfo)=>{
+        const username = testInfo.project.metadata.appUsername;
+        const password = testInfo.project.metadata.appPassword;
 
-    const loginPage = new LoginPage(page);
+        const homePage = await loginPage.doLogin(username, password);
+        expect(await homePage.isUserLoggedIn()).toBeTruthy();
+        
+        await use(homePage);
+        
+    }
 
-    await loginPage.goToLoginPage(baseURL);
-
-    let uesrname=testInfo.project.metadata.appUsername;
-    let password= testInfo.project.metadata.appPassword;
-
-
-    const  homePage = await loginPage.doLogin(uesrname,password);
-
-    expect(await homePage.isUserLoggedIn()).toBeTruthy();
-
-
-    await use(homePage);
-}
-
+    
 });
+
+
 
 export { expect };
