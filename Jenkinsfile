@@ -835,3 +835,9 @@ ${env.PROD_EMOJI ?: '❓'} PROD: ${env.PROD_TEST_STATUS ?: 'not run'}
         }
     }
 }
+slackSend(
+    channel: '#all-mallammahr',
+    color: 'danger',
+    tokenCredentialId: 'slack-webhook-token',
+    message: "Pipeline failed!"
+)
