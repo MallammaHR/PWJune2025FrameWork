@@ -1,5 +1,5 @@
 import { LoginPage } from '../pages/LoginPage';
-import { test, expect } from '../fixtures/baseFixtures'
+import { test, expect } from '../fixtures/basefixture'
 
 
 test('verify valid login @login',

@@ -1,5 +1,5 @@
 import { ResultsPage } from '../pages/ResultsPage';
-import { test, expect } from '../fixtures/baseFixtures'
+import { test, expect } from '../fixtures/basefixture'
 
 
 //data provider for product search key and results count

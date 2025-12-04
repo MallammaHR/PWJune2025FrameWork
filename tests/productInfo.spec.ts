@@ -2,7 +2,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/HomePage';
 import { ResultsPage } from '../pages/ResultsPage';
 import { ProductInfoPage } from '../pages/ProductInfoPage';
-import { test, expect } from '../fixtures/baseFixtures'
+import { test, expect } from '../fixtures/basefixture'
 
 
 
