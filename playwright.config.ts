@@ -168,7 +168,7 @@ export default defineConfig({
         channel: 'chrome',
         viewport: null,
         launchOptions: {
-          args: ['--start-maximized'],
+          args: ['--start-....maximized'],
           ignoreDefaultArgs: ['--window-size=1280,720']
         }
       }
