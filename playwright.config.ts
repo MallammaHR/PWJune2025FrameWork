@@ -61,17 +61,17 @@
 //     }
 //   },
 
-//   // {
-//   //   name: 'Microsoft Edge',
-//   //   use: {
-//   //     channel: 'msedge',
-//   //     viewport: null,
-//   //     launchOptions: {
-//   //       args: ['--start-maximized'],
-//   //       ignoreDefaultArgs: ['--window-size=1280,720']
-//   //     }
-//   //   }
-//   // },
+  // {
+  //   name: 'Microsoft Edge',
+  //   use: {
+  //     channel: 'msedge',
+  //     viewport: null,
+  //     launchOptions: {
+  //       args: ['--start-maximized'],
+  //       ignoreDefaultArgs: ['--window-size=1280,720']
+  //     }
+  //   }
+  // },
 
 //   // {
 //   //   name: 'Chromium',
@@ -173,5 +173,16 @@ export default defineConfig({
         }
       }
     },
+      {
+    name: 'Microsoft Edge',
+    use: {
+      channel: 'msedge',
+      viewport: null,
+      launchOptions: {
+        args: ['--start-maximized'],
+        ignoreDefaultArgs: ['--window-size=1280,720']
+      }
+    }
+  },
   ],
 });
