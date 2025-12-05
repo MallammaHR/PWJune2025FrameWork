@@ -4,7 +4,7 @@ Welcome to the **PWJune2025FrameWork** automation project. Below you can find th
 
 ---
 # Dashboard Page 🏠
-[![Playwright Tests](https://github.com/ShashikantBodke/PlaywrightTypeScriptFW2025/actions/workflows/manual-run.yml/badge.svg)](https://shashikantbodke.github.io/PlaywrightTypeScriptFW2025/)
+[![Playwright Tests](https://github.com/mallammahr/June2025PWFramework/actions/workflows/manual-run.yml/badge.svg)](https://shashikantbodke.github.io/PlaywrightTypeScriptFW2025/)
 
 
 ## Workflow Status
