@@ -29,7 +29,6 @@ pipeline {
     agent any
 
     tools {
-        git 'Git-Windows'
         nodejs 'NodeJS-20'
     }
 
