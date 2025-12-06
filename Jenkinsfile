@@ -38,7 +38,7 @@ pipeline {
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/.cache/ms-playwright"
         SLACK_WEBHOOK_URL = credentials('slack-webhook-token')
         // Email recipients - update these with your actual email addresses
-        EMAIL_RECIPIENTS = 'naveenanimation20@gmail.com, submit@naveenautomationlabs.com'
+        EMAIL_RECIPIENTS = 'mallammahr05@gmail.com'
     }
 
     options {
@@ -62,7 +62,8 @@ pipeline {
                 echo '============================================'
                 echo '📁 Creating ESLint report directory...'
                 echo '============================================'
-                bat 'mkdir -p eslint-report'
+                bat 'mkdir eslint-report'
+
 
                 echo '============================================'
                 echo '🔍 Running ESLint...'
