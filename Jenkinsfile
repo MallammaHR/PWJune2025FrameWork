@@ -517,7 +517,6 @@ ${env.PROD_EMOJI ?: '✅'} PROD: ${env.PROD_TEST_STATUS}
             script {
                 try {
                     slackSend(
-                        channel: '#test_automation1',
                         color: 'danger',
                         message: """❌ *Playwright Pipeline: Tests Failed*
 *Repository:* ${env.JOB_NAME}
