@@ -53,7 +53,7 @@ pipeline {
         // Static Code Analysis (ESLint)
         // ============================================
         stage('🔍 ESLint Analysis') {
-    steps {
+        steps {
         echo '============================================'
         echo '📥 Installing dependencies...'
         echo '============================================'
@@ -70,11 +70,11 @@ pipeline {
         script {
             def eslintStatus = bat(script: 'npm run lint', returnStatus: true)
             env.ESLINT_STATUS = eslintStatus == 0 ? 'success' : 'failure'
+            }
         }
     }
+
 }
-
-
                 echo '============================================'
                 echo '📊 Generating ESLint HTML Report...'
                 echo '============================================'
