@@ -53,7 +53,7 @@ pipeline {
         // Static Code Analysis (ESLint)
         // ============================================
         stage('🔍 ESLint Analysis') {
-        steps {
+    steps {
         echo '============================================'
         echo '📥 Installing dependencies...'
         echo '============================================'
@@ -70,37 +70,37 @@ pipeline {
         script {
             def eslintStatus = bat(script: 'npm run lint', returnStatus: true)
             env.ESLINT_STATUS = eslintStatus == 0 ? 'success' : 'failure'
-            }
         }
-    }
 
-}
-                echo '============================================'
-                echo '📊 Generating ESLint HTML Report...'
-                echo '============================================'
-                bat 'npm run lint:report || true'
-            }
-            post {
-                always {
-                    publishHTML(target: [
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'eslint-report',
-                        reportFiles: 'index.html',
-                        reportName: 'ESLint Report',
-                        reportTitles: 'ESLint Analysis'
-                    ])
-                    script {
-                        if (env.ESLINT_STATUS == 'failure') {
-                            echo '⚠️ ESLint found issues - check the HTML report'
-                        } else {
-                            echo '✅ No ESLint issues found'
-                        }
-                    }
+        echo '============================================'
+        echo '📊 Generating ESLint HTML Report...'
+        echo '============================================'
+        bat 'npm run lint:report || true'
+    }
+    
+    post {
+        always {
+            publishHTML(target: [
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'eslint-report',
+                reportFiles: 'index.html',
+                reportName: 'ESLint Report',
+                reportTitles: 'ESLint Analysis'
+            ])
+
+            script {
+                if (env.ESLINT_STATUS == 'failure') {
+                    echo '⚠️ ESLint found issues - check the HTML report'
+                } else {
+                    echo '✅ No ESLint issues found'
                 }
             }
         }
+    }
+}
+
 
         // ============================================
         // DEV Environment Tests
