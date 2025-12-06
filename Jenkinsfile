@@ -659,32 +659,25 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
             }
         }
 
-        failure {
-            echo '❌ Pipeline failed!'
+failure {
+    echo '❌ Pipeline failed!'
 
-            script {
-                // Slack notification
-                try {
-                    slackSend(
-                        color: 'danger',
-                        message: """❌ *Playwright Pipeline: Tests Failed*
+    withCredentials([string(credentialsId: 'SLACK_WEBHOOK_URL', variable: 'WEBHOOK')]) {
+        sh """
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{
+            "text": "❌ *Playwright Pipeline: Tests Failed*\\n\
+*Repository:* ${env.JOB_NAME}\\n\
+*Branch:* ${env.GIT_BRANCH ?: "N/A"}\\n\
+*Build:* #${env.BUILD_NUMBER}\\n\
+\\n\
+📌 Jenkins URL: ${env.BUILD_URL}"
+        }' \
+        $WEBHOOK
+        """
+    }
+}
 
-*Repository:* ${env.JOB_NAME}
-*Branch:* ${env.GIT_BRANCH ?: 'N/A'}
-*Build:* #${env.BUILD_NUMBER}
-
-*Test Results:*
-${env.DEV_EMOJI ?: '❓'} DEV: ${env.DEV_TEST_STATUS ?: 'not run'}
-${env.QA_EMOJI ?: '❓'} QA: ${env.QA_TEST_STATUS ?: 'not run'}
-${env.STAGE_EMOJI ?: '❓'} STAGE: ${env.STAGE_TEST_STATUS ?: 'not run'}
-${env.PROD_EMOJI ?: '❓'} PROD: ${env.PROD_TEST_STATUS ?: 'not run'}
-
-📊 <${env.BUILD_URL}allure|View Allure Report>
-🔗 <${env.BUILD_URL}|View Build>"""
-                    )
-                } catch (Exception e) {
-                    echo "Slack notification failed: ${e.message}"
-                }
 
                 // Email notification
                 try {
@@ -811,18 +804,6 @@ ${env.PROD_EMOJI ?: '❓'} PROD: ${env.PROD_TEST_STATUS ?: 'not run'}
                 }
             }
         }
-        stage('Notify Slack') {
-    steps {
-        withCredentials([string(credentialsId: 'SLACK_WEBHOOK_SECRET', variable: 'WEBHOOK')]) {
-            sh """
-            curl -X POST -H 'Content-type: application/json' \
-            --data '{\"text\": \"❌ Pipeline Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}\"}' \
-            $WEBHOOK
-            """
-        }
-    }
-}
-
 
         unstable {
             echo '⚠️ Pipeline completed with warnings!'
