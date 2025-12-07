@@ -91,7 +91,11 @@ pipeline {
                 echo '🧹 Cleaning previous results...'
                 echo '============================================'
                 // Use PowerShell to remove folders safely on Windows
-                bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-html-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"test-results\\\"; Exit 0"'
+                powershell '''
+                    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "allure-results-combined"
+                    New-Item -ItemType Directory -Path "allure-results-combined" -Force | Out-Null
+                    '''
+
 
                 echo '============================================'
                 echo '🧪 Running DEV tests...'
