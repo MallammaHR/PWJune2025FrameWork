@@ -28,31 +28,34 @@ pipeline {
         // ============================================
         // Static Code Analysis (ESLint)
         // ============================================
-stage('🔍 ESLint Analysis') {
-    steps {
-        withEnv(["PUPPETEER_SKIP_DOWNLOAD=true"]) {
+                    stage('🔍 ESLint Analysis') {
+            steps {
+                withEnv(["PUPPETEER_SKIP_DOWNLOAD=true"]) {
 
-            echo '============================================'
-            echo '📥 Installing dependencies...'
-            echo '============================================'
-            bat 'npm ci'
+                    echo '============================================'
+                    echo '📥 Installing dependencies...'
+                    echo '============================================'
+                    bat 'npm ci'
 
-            echo '============================================'
-            echo '📁 Generating ESLint HTML report...'
-            echo '============================================'
-            bat 'npm run lint || exit 0'
+                    echo '============================================'
+                    echo '📁 Generating ESLint HTML report...'
+                    echo '============================================'
+                    bat 'npm run lint || exit 0'
 
-            echo '============================================'
-            echo '🔍 Running ESLint...'
-            echo '============================================'
+                    echo '============================================'
+                    echo '🔍 Running ESLint...'
+                    echo '============================================'
 
-            script {
-                def eslintStatus = bat(script: 'npm run lint', returnStatus: true)
-                env.ESLINT_STATUS = eslintStatus == 0 ? 'success' : 'failure'
+                    script {
+                        def eslintStatus = bat(
+                            script: 'npm run lint',
+                            returnStatus: true
+                        )
+                        env.ESLINT_STATUS = eslintStatus == 0 ? 'success' : 'failure'
+                    }
+                }
             }
-        }
-    }
-}
+
             post {
                 always {
                     publishHTML(target: [
