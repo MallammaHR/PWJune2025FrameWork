@@ -10,9 +10,9 @@ pipeline {
     }
 
     environment {
-       NODE_VERSION = '20'
-       CI = 'true'
-       PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}\\.cache\\ms-playwright"
+        NODE_VERSION = '20'
+        CI = 'true'
+        PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}\\.cache\\ms-playwright"
         EMAIL_RECIPIENTS = 'mallammahr05@gmail.com'
     }
 
@@ -27,36 +27,32 @@ pipeline {
         // ============================================
         // Static Code Analysis (ESLint)
         // ============================================
-                    stage('🔍 ESLint Analysis') {
+        stage('🔍 ESLint Analysis') {
             steps {
                 withEnv(["PUPPETEER_SKIP_DOWNLOAD=true"]) {
-
                     echo '============================================'
                     echo '📥 Installing dependencies...'
                     echo '============================================'
                     bat 'npm ci'
 
                     echo '============================================'
-                    echo '📁 Generating ESLint HTML report...'
-                    echo '============================================'
-                    bat 'npm run lint || exit 0'
-
-                    echo '============================================'
-                    echo '🔍 Running ESLint...'
+                    echo '🔍 Running ESLint and generating report...'
                     echo '============================================'
 
                     script {
-                        def eslintStatus = bat(
+                        // Run eslint once and capture exit code
+                        def lintExit = bat(
                             script: 'npm run lint',
                             returnStatus: true
                         )
-                        env.ESLINT_STATUS = eslintStatus == 0 ? 'success' : 'failure'
+                        env.ESLINT_STATUS = (lintExit == 0) ? 'success' : 'failure'
                     }
                 }
             }
 
             post {
                 always {
+                    // publish html from folder if present
                     publishHTML(target: [
                         allowMissing: true,
                         alwaysLinkToLastBuild: true,
@@ -92,35 +88,31 @@ pipeline {
                 echo '============================================'
                 echo '🧹 Cleaning previous results...'
                 echo '============================================'
-                // Use PowerShell to remove folders safely on Windows
                 powershell '''
                     Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "allure-results-combined"
                     New-Item -ItemType Directory -Path "allure-results-combined" -Force | Out-Null
-                        '''
-
+                '''
 
                 echo '============================================'
                 echo '🧪 Running DEV tests...'
                 echo '============================================'
                 script {
-                    env.DEV_TEST_STATUS = bat(
+                    env.DEV_TEST_STATUS = (bat(
                         script: 'npx playwright test --grep "@login" --config=playwright.config.dev.ts',
                         returnStatus: true
-                    ) == 0 ? 'success' : 'failure'
+                    ) == 0) ? 'success' : 'failure'
                 }
 
                 echo '============================================'
-                echo '🏷️ Adding Allure environment info...'
+                echo '🏷️ Adding Allure environment info (DEV)...'
                 echo '============================================'
-                // create allure-results and write environment.properties using PowerShell (works on Windows)
-                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\\"allure-results\\\" -Force | Out-Null; Set-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Environment=DEV\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Browser=Google Chrome\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Config=playwright.config.dev.ts\\\"; Exit 0"'
+                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\"allure-results\\" -Force | Out-Null; Set-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Environment=DEV\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Browser=Google Chrome\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Config=playwright.config.dev.ts\\"; Exit 0"'
             }
 
             post {
                 always {
                     // copy and generate DEV Allure report (PowerShell copy)
-                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results-dev\\\"; New-Item -ItemType Directory -Path \\\"allure-results-dev\\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\*\\\" \\\"allure-results-dev\\\"; Exit 0"'
-                    // generate allure report (if allure exists)
+                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results-dev\\"; New-Item -ItemType Directory -Path \\"allure-results-dev\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results\\*\\" \\"allure-results-dev\\"; Exit 0"'
                     bat 'npx allure generate allure-results-dev --clean -o allure-report-dev || echo \"allure generate failed or not installed\"'
 
                     publishHTML(target: [
@@ -167,27 +159,27 @@ pipeline {
                 echo '============================================'
                 echo '🧹 Cleaning previous results...'
                 echo '============================================'
-                bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-html-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"test-results\\\"; Exit 0"'
+                bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"playwright-report\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"playwright-html-report\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"test-results\\"; Exit 0"'
 
                 echo '============================================'
                 echo '🧪 Running QA tests...'
                 echo '============================================'
                 script {
-                    env.QA_TEST_STATUS = bat(
+                    env.QA_TEST_STATUS = (bat(
                         script: 'npx playwright test --grep "@login" --config=playwright.config.qa.ts',
                         returnStatus: true
-                    ) == 0 ? 'success' : 'failure'
+                    ) == 0) ? 'success' : 'failure'
                 }
 
                 echo '============================================'
-                echo '🏷️ Adding Allure environment info...'
+                echo '🏷️ Adding Allure environment info (QA)...'
                 echo '============================================'
-                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\\"allure-results\\\" -Force | Out-Null; Set-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Environment=QA\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Browser=Google Chrome\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Config=playwright.config.qa.ts\\\"; Exit 0"'
+                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\"allure-results\\" -Force | Out-Null; Set-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Environment=QA\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Browser=Google Chrome\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Config=playwright.config.qa.ts\\"; Exit 0"'
             }
 
             post {
                 always {
-                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results-qa\\\"; New-Item -ItemType Directory -Path \\\"allure-results-qa\\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\*\\\" \\\"allure-results-qa\\\"; Exit 0"'
+                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results-qa\\"; New-Item -ItemType Directory -Path \\"allure-results-qa\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results\\*\\" \\"allure-results-qa\\"; Exit 0"'
                     bat 'npx allure generate allure-results-qa --clean -o allure-report-qa || echo \"allure generate failed or not installed\"'
 
                     publishHTML(target: [
@@ -234,27 +226,27 @@ pipeline {
                 echo '============================================'
                 echo '🧹 Cleaning previous results...'
                 echo '============================================'
-                bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-html-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"test-results\\\"; Exit 0"'
+                bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"playwright-report\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"playwright-html-report\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"test-results\\"; Exit 0"'
 
                 echo '============================================'
                 echo '🧪 Running STAGE tests...'
                 echo '============================================'
                 script {
-                    env.STAGE_TEST_STATUS = bat(
+                    env.STAGE_TEST_STATUS = (bat(
                         script: 'npx playwright test --grep "@login" --config=playwright.config.stage.ts',
                         returnStatus: true
-                    ) == 0 ? 'success' : 'failure'
+                    ) == 0) ? 'success' : 'failure'
                 }
 
                 echo '============================================'
-                echo '🏷️ Adding Allure environment info...'
+                echo '🏷️ Adding Allure environment info (STAGE)...'
                 echo '============================================'
-                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\\"allure-results\\\" -Force | Out-Null; Set-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Environment=STAGE\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Browser=Google Chrome\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Config=playwright.config.stage.ts\\\"; Exit 0"'
+                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\"allure-results\\" -Force | Out-Null; Set-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Environment=STAGE\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Browser=Google Chrome\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Config=playwright.config.stage.ts\\"; Exit 0"'
             }
 
             post {
                 always {
-                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results-stage\\\"; New-Item -ItemType Directory -Path \\\"allure-results-stage\\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\*\\\" \\\"allure-results-stage\\\"; Exit 0"'
+                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results-stage\\"; New-Item -ItemType Directory -Path \\"allure-results-stage\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results\\*\\" \\"allure-results-stage\\"; Exit 0"'
                     bat 'npx allure generate allure-results-stage --clean -o allure-report-stage || echo \"allure generate failed or not installed\"'
 
                     publishHTML(target: [
@@ -301,27 +293,27 @@ pipeline {
                 echo '============================================'
                 echo '🧹 Cleaning previous results...'
                 echo '============================================'
-                bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"playwright-html-report\\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"test-results\\\"; Exit 0"'
+                bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"playwright-report\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"playwright-html-report\\"; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"test-results\\"; Exit 0"'
 
                 echo '============================================'
                 echo '🧪 Running PROD tests...'
                 echo '============================================'
                 script {
-                    env.PROD_TEST_STATUS = bat(
+                    env.PROD_TEST_STATUS = (bat(
                         script: 'npx playwright test --grep "@login" --config=playwright.config.prod.ts',
                         returnStatus: true
-                    ) == 0 ? 'success' : 'failure'
+                    ) == 0) ? 'success' : 'failure'
                 }
 
                 echo '============================================'
-                echo '🏷️ Adding Allure environment info...'
+                echo '🏷️ Adding Allure environment info (PROD)...'
                 echo '============================================'
-                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\\"allure-results\\\" -Force | Out-Null; Set-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Environment=PROD\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Browser=Google Chrome\\\"; Add-Content -Path \\\"allure-results\\environment.properties\\\" -Value \\\"Config=playwright.config.prod.ts\\\"; Exit 0"'
+                bat 'powershell -NoProfile -Command "New-Item -ItemType Directory -Path \\"allure-results\\" -Force | Out-Null; Set-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Environment=PROD\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Browser=Google Chrome\\"; Add-Content -Path \\"allure-results\\environment.properties\\" -Value \\"Config=playwright.config.prod.ts\\"; Exit 0"'
             }
 
             post {
                 always {
-                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results-prod\\\"; New-Item -ItemType Directory -Path \\\"allure-results-prod\\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\\"allure-results\\*\\\" \\\"allure-results-prod\\\"; Exit 0"'
+                    bat 'powershell -NoProfile -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results-prod\\"; New-Item -ItemType Directory -Path \\"allure-results-prod\\" -Force | Out-Null; Copy-Item -Recurse -Force -ErrorAction SilentlyContinue \\"allure-results\\*\\" \\"allure-results-prod\\"; Exit 0"'
                     bat 'npx allure generate allure-results-prod --clean -o allure-report-prod || echo \"allure generate failed or not installed\"'
 
                     publishHTML(target: [
@@ -369,8 +361,7 @@ pipeline {
                 echo '📊 Generating Combined Allure Report...'
                 echo '============================================'
 
-                // Use PowerShell to merge copied environment results onto combined folder
-               bat '''
+                bat '''
                 powershell -NoProfile -Command "
                 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-combined'
                 New-Item -ItemType Directory -Path 'allure-results-combined' -Force | Out-Null
@@ -391,9 +382,9 @@ pipeline {
             }
             post {
                 always {
-                    // generate combined report (if allure installed)
                     bat 'npx allure generate allure-results-combined --clean -o allure-report-combined || echo \"allure generate failed or not installed\"'
 
+                    // Use the Allure plugin if available
                     allure([
                         includeProperties: true,
                         jdk: '',
@@ -422,10 +413,10 @@ pipeline {
                 def stageStatus = env.STAGE_TEST_STATUS ?: 'unknown'
                 def prodStatus = env.PROD_TEST_STATUS ?: 'unknown'
 
-                def devEmoji = devStatus == 'success' ? '✅' : '❌'
-                def qaEmoji = qaStatus == 'success' ? '✅' : '❌'
-                def stageEmoji = stageStatus == 'success' ? '✅' : '❌'
-                def prodEmoji = prodStatus == 'success' ? '✅' : '❌'
+                def devEmoji = (devStatus == 'success') ? '✅' : '❌'
+                def qaEmoji = (qaStatus == 'success') ? '✅' : '❌'
+                def stageEmoji = (stageStatus == 'success') ? '✅' : '❌'
+                def prodEmoji = (prodStatus == 'success') ? '✅' : '❌'
 
                 echo """
 ============================================
@@ -469,9 +460,9 @@ ${prodEmoji} PROD:  ${prodStatus}
                 try {
                     slackSend(
                         color: 'good',
-                        message: """✅ *Playwright Pipeline: All Tests Passed*
+                        message: """${env.STATUS_EMOJI} *Playwright Pipeline: All Tests Passed*
 
-*Repository:* ${env.JOB_NAME}
+*Repository:* ${env.JOB_NAME ?: 'N/A'}
 *Branch:* ${env.GIT_BRANCH ?: 'N/A'}
 *Build:* #${env.BUILD_NUMBER}
 
@@ -491,7 +482,7 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
                 // Send email (keeps your original HTML payload)
                 try {
                     emailext(
-                        subject: "✅ Playwright Tests Passed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        subject: "✅ Playwright Tests Passed - ${env.JOB_NAME ?: 'Job'} #${env.BUILD_NUMBER}",
                         body: """<!DOCTYPE html><html><head> ... (omitted here to keep Jenkinsfile compact) ...</html>""",
                         mimeType: 'text/html',
                         to: env.EMAIL_RECIPIENTS,
@@ -503,38 +494,35 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
                 }
             }
         }
-failure {
-    echo '❌ Pipeline failed!'
 
-    script {
-        // Slack Notification (Safe)
-        try {
-            slackSend(
-                channel: '#test_automation1',
-                color: 'danger',
-                message: "❌ Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed"
-            )
-        } catch (Exception e) {
-            echo "Slack notification failed: ${e.message}"
-            echo "Slack failed but pipeline WILL NOT fail"
-        }
+        failure {
+            echo '❌ Pipeline failed!'
 
-        // Email Notification (Safe)
-        try {
-            emailext(
-                subject: "❌ Playwright Tests Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """<!DOCTYPE html><html><head> ... (omitted) ...</html>""",
-                mimeType: 'text/html',
-                to: env.EMAIL_RECIPIENTS,
-                from: 'CI Notifications <mallammahr05@gmail.com>',
-                replyTo: 'bodkeshashi12@gmail.com'
-            )
-        } catch (Exception e) {
-            echo "Email notification failed: ${e.message}"
-            echo "Email failed but pipeline WILL NOT fail"
+            script {
+                try {
+                    slackSend(
+                        channel: '#test_automation1',
+                        color: 'danger',
+                        message: "❌ Pipeline ${env.JOB_NAME ?: 'Job'} #${env.BUILD_NUMBER} failed"
+                    )
+                } catch (Exception e) {
+                    echo "Slack notification failed: ${e.message}"
+                }
+
+                try {
+                    emailext(
+                        subject: "❌ Playwright Tests Failed - ${env.JOB_NAME ?: 'Job'} #${env.BUILD_NUMBER}",
+                        body: """<!DOCTYPE html><html><head> ... (omitted) ...</html>""",
+                        mimeType: 'text/html',
+                        to: env.EMAIL_RECIPIENTS,
+                        from: 'CI Notifications <mallammahr05@gmail.com>',
+                        replyTo: 'bodkeshashi12@gmail.com'
+                    )
+                } catch (Exception e) {
+                    echo "Email notification failed: ${e.message}"
+                }
+            }
         }
-    }
-}
 
         unstable {
             echo '⚠️ Pipeline completed with warnings!'
@@ -544,7 +532,7 @@ failure {
                         color: 'warning',
                         message: """⚠️ *Playwright Pipeline: Unstable*
 
-*Repository:* ${env.JOB_NAME}
+*Repository:* ${env.JOB_NAME ?: 'N/A'}
 *Branch:* ${env.GIT_BRANCH ?: 'N/A'}
 *Build:* #${env.BUILD_NUMBER}
 
