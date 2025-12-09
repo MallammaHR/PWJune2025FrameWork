@@ -10,10 +10,9 @@ pipeline {
     }
 
     environment {
-        NODE_VERSION = '20'
-        CI = 'true'
-        PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}\\.cache\\ms-playwright"
-        SLACK_WEBHOOK_URL = credentials('slack-webhook-token')
+       NODE_VERSION = '20'
+       CI = 'true'
+       PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}\\.cache\\ms-playwright"
         EMAIL_RECIPIENTS = 'mallammahr05@gmail.com'
     }
 
@@ -507,43 +506,34 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
 
         failure {
             echo '❌ Pipeline failed!'
-            script {
-                try {
-                    slackSend(
-                        color: 'danger',
-                        message: """❌ *Playwright Pipeline: Tests Failed*
-
-*Repository:* ${env.JOB_NAME}
-*Branch:* ${env.GIT_BRANCH ?: 'N/A'}
-*Build:* #${env.BUILD_NUMBER}
-
-*Test Results:*
-${env.DEV_EMOJI ?: '❓'} DEV: ${env.DEV_TEST_STATUS ?: 'not run'}
-${env.QA_EMOJI ?: '❓'} QA: ${env.QA_TEST_STATUS ?: 'not run'}
-${env.STAGE_EMOJI ?: '❓'} STAGE: ${env.STAGE_TEST_STATUS ?: 'not run'}
-${env.PROD_EMOJI ?: '❓'} PROD: ${env.PROD_TEST_STATUS ?: 'not run'}
-
-📊 <${env.BUILD_URL}allure|View Allure Report>
-🔗 <${env.BUILD_URL}|View Build>"""
-                    )
-                } catch (Exception e) {
-                    echo "Slack notification failed: ${e.message}"
-                }
-
-                try {
-                    emailext(
-                        subject: "❌ Playwright Tests Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """<!DOCTYPE html><html><head> ... (omitted) ...</html>""",
-                        mimeType: 'text/html',
-                        to: env.EMAIL_RECIPIENTS,
-                        from: 'CI Notifications <mail@naveenautomationlabs.com>',
-                        replyTo: 'mail@naveenautomationlabs.com'
-                    )
-                } catch (Exception e) {
-                    echo "Email notification failed: ${e.message}"
-                }
-            }
+    script {
+        try {
+            slackSend(
+                color: 'danger',
+                message: "❌ Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed"
+            )
+        } catch (Exception e) {
+            echo "Slack notification failed: ${e.message}"
+            echo "Slack failed but pipeline WILL NOT fail"
         }
+
+        try {
+            emailext(
+                subject: "❌ Playwright Tests Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """<!DOCTYPE html><html><head> ... (omitted) ...</html>""",
+                mimeType: 'text/html',
+                to: env.EMAIL_RECIPIENTS,
+                from: 'CI Notifications <mail@naveenautomationlabs.com>',
+                replyTo: 'mail@naveenautomationlabs.com'
+            )
+        } catch (Exception e) {
+            echo "Email notification failed: ${e.message}"
+            echo "Email failed but pipeline WILL NOT fail"
+        }
+    }
+            
+            }
+        
 
         unstable {
             echo '⚠️ Pipeline completed with warnings!'
