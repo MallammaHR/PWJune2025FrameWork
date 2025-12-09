@@ -495,20 +495,22 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
                         body: """<!DOCTYPE html><html><head> ... (omitted here to keep Jenkinsfile compact) ...</html>""",
                         mimeType: 'text/html',
                         to: env.EMAIL_RECIPIENTS,
-                        from: 'CI Notifications <mallammahr05@gmail.com>',
-                        replyTo: 'bodkeshashi12@gmail.com'
+                        from: 'CI Notifications <mail@naveenautomationlabs.com>',
+                        replyTo: 'mallammahr05@gmail.com'
                     )
                 } catch (Exception e) {
                     echo "Email notification failed: ${e.message}"
                 }
             }
         }
+failure {
+    echo '❌ Pipeline failed!'
 
-        failure {
-            echo '❌ Pipeline failed!'
     script {
+        // Slack Notification (Safe)
         try {
             slackSend(
+                channel: '#test_automation1',
                 color: 'danger',
                 message: "❌ Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed"
             )
@@ -517,6 +519,7 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
             echo "Slack failed but pipeline WILL NOT fail"
         }
 
+        // Email Notification (Safe)
         try {
             emailext(
                 subject: "❌ Playwright Tests Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
@@ -531,9 +534,7 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
             echo "Email failed but pipeline WILL NOT fail"
         }
     }
-            
-            }
-        
+}
 
         unstable {
             echo '⚠️ Pipeline completed with warnings!'
