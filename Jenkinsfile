@@ -370,23 +370,23 @@ pipeline {
                 echo '============================================'
 
                 // Use PowerShell to merge copied environment results onto combined folder
-                bat '''
-                    powershell """
-                    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-combined'
-                    New-Item -ItemType Directory -Path 'allure-results-combined' -Force | Out-Null
+               bat '''
+                powershell -NoProfile -Command "
+                Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-combined'
+                New-Item -ItemType Directory -Path 'allure-results-combined' -Force | Out-Null
 
-                    Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-dev\\*' 'allure-results-combined'
-                    Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-qa\\*' 'allure-results-combined'
-                    Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-stage\\*' 'allure-results-combined'
-                    Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-prod\\*' 'allure-results-combined'
+                Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-dev\\*' 'allure-results-combined'
+                Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-qa\\*' 'allure-results-combined'
+                Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-stage\\*' 'allure-results-combined'
+                Copy-Item -Recurse -Force -ErrorAction SilentlyContinue 'allure-results-prod\\*' 'allure-results-combined'
 
-                    Set-Content -Path 'allure-results-combined\\environment.properties' -Value 'Environment=ALL (DEV, QA, STAGE, PROD)'
-                    Add-Content -Path 'allure-results-combined\\environment.properties' -Value 'Browser=Google Chrome'
-                    Add-Content -Path 'allure-results-combined\\environment.properties' -Value "Pipeline=${env.JOB_NAME}"
-                    Add-Content -Path 'allure-results-combined\\environment.properties' -Value "Build=${env.BUILD_NUMBER}"
+                Set-Content -Path 'allure-results-combined\\environment.properties' -Value 'Environment=ALL (DEV, QA, STAGE, PROD)'
+                Add-Content -Path 'allure-results-combined\\environment.properties' -Value 'Browser=Google Chrome'
+                Add-Content -Path 'allure-results-combined\\environment.properties' -Value \"Pipeline=${env.JOB_NAME}\"
+                Add-Content -Path 'allure-results-combined\\environment.properties' -Value \"Build=${env.BUILD_NUMBER}\"
 
-                    exit 0
-                    """
+                exit 0
+                "
                 '''
             }
             post {
@@ -495,8 +495,8 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
                         body: """<!DOCTYPE html><html><head> ... (omitted here to keep Jenkinsfile compact) ...</html>""",
                         mimeType: 'text/html',
                         to: env.EMAIL_RECIPIENTS,
-                        from: 'CI Notifications <mail@naveenautomationlabs.com>',
-                        replyTo: 'mail@naveenautomationlabs.com'
+                        from: 'CI Notifications <mallammahr05@gmail.com>',
+                        replyTo: 'bodkeshashi12@gmail.com'
                     )
                 } catch (Exception e) {
                     echo "Email notification failed: ${e.message}"
@@ -523,8 +523,8 @@ ${env.PROD_EMOJI} PROD: ${env.PROD_TEST_STATUS}
                 body: """<!DOCTYPE html><html><head> ... (omitted) ...</html>""",
                 mimeType: 'text/html',
                 to: env.EMAIL_RECIPIENTS,
-                from: 'CI Notifications <mail@naveenautomationlabs.com>',
-                replyTo: 'mail@naveenautomationlabs.com'
+                from: 'CI Notifications <mallammahr05@gmail.com>',
+                replyTo: 'bodkeshashi12@gmail.com'
             )
         } catch (Exception e) {
             echo "Email notification failed: ${e.message}"
