@@ -15,7 +15,7 @@ type csvFixture = {
 };
 
 export const test = base.extend<csvFixture>({
-    regData: async (_, use) => {
+    regData: async ({}, use) => {
         const fileContent = fs.readFileSync('./data/register.csv', 'utf-8');
         const registrationData: RegData[] = parse(fileContent, {
             columns: true,
