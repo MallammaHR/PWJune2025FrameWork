@@ -15,6 +15,7 @@ type csvFixture = {
 };
 
 export const test = base.extend<csvFixture>({
+ // eslint-disable-next-line no-empty-pattern
     regData: async ({}, use) => {
         const fileContent = fs.readFileSync('./data/register.csv', 'utf-8');
         const registrationData: RegData[] = parse(fileContent, {
