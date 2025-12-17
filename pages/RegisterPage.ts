@@ -1,7 +1,5 @@
 import { Locator, Page } from '@playwright/test';
 import { ElementUtil } from '../utils/ElementUtil';
-import { HomePage } from './HomePage';
-
 
 
 export class RegisterPage{
@@ -38,14 +36,9 @@ export class RegisterPage{
     }
 
 
-async registerUser(
-        firstName: string,
-        lastName: string,
-        email: string,
-        telephone: string,
-        password: string,
-        subscribeNewsletter: string
-    ): Promise<boolean> {
+async registerUser(firstName: string,lastName: string,email: string,
+                    telephone: string,password: string,subscribeNewsletter: string)
+                    : Promise<boolean> {
 
         await this.eleUtil.fill(this.firstNameInput, firstName);
         await this.eleUtil.fill(this.lastNameInput, lastName);
@@ -65,11 +58,10 @@ async registerUser(
         return await this.eleUtil.isVisible(this.successMsg);
     }
 
-    // async verifyAccountCreated(successMsg:string) {
-    //     let succesMsg  = this.successMsg.getByText(successMsg)
-    //     console.log('the account created sunccess Message is : '+succesMsg);
+    // async verifyAccountCreated() {
     //     await expect(this.successMsg).toBeVisible();
-
     // }
+
+
 
 }

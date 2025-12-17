@@ -1,48 +1,48 @@
 import { Locator, Page } from '@playwright/test';
 import { ElementUtil } from '../utils/ElementUtil';
-import { LoginPage } from '../pages/LoginPage';
-import { ResultsPage } from '../pages/ResultsPage';
+import { LoginPage } from './LoginPage';
+import { ResultsPage } from './ResultsPage';
 
 
-export class HomePage{
+export class HomePage {
 
-    //1. page locators/objects/OR:
-   readonly page: Page;
-    private readonly eleUtil: ElementUtil;
+    readonly page: Page;
+    private readonly eleUtil;
     private readonly loginLink: Locator;
     private readonly logoutLink: Locator;
     private readonly search: Locator;
+    private readonly searchicon: Locator;
 
-    private readonly searchIcon: Locator;
-    
-
-
-    //2. page class constructor...
     constructor(page: Page) {
         this.page = page;
         this.eleUtil = new ElementUtil(page);
-        this.logoutLink = page.getByRole('link', { name: 'Logout' });
+        this.logoutLink = page.locator('#column-right').getByRole('link', { name: 'Logout' });
         this.loginLink = page.getByRole('link', { name: 'Login' });
         this.search = page.getByRole('textbox', { name: 'Search' });
-        this.searchIcon = page.locator('#search > span.input-group-btn > button.btn');
+        this.searchicon = page.locator('.btn.btn-default.btn-lg');
     }
 
-    //3. page actions:
     async isUserLoggedIn(): Promise<boolean> {
-        return await this.eleUtil.isVisible(this.logoutLink);
+        return await this.eleUtil.isVisible(this.logoutLink);   
     }
 
-    async logout(): Promise<LoginPage> {
+    async doLogOut(): Promise<LoginPage> {
         await this.eleUtil.click(this.logoutLink, { timeout: 5000 }, 1);
         await this.eleUtil.click(this.loginLink, { timeout: 5000 }, 1);
         return new LoginPage(this.page);
     }
 
-    async doSearch(searchKey: string) :Promise<ResultsPage>{
-        console.log(`search key : ${searchKey}`);
+    async doSearch(searchKey: string): Promise<ResultsPage> {
+        console.log(`Search Key : ${searchKey}`);
         await this.eleUtil.fill(this.search, searchKey);
-        await this.eleUtil.click(this.searchIcon);
+        await this.eleUtil.click(this.searchicon);
         return new ResultsPage(this.page);
-   }
+    }
+
+
+
+
+
+
 
 }
