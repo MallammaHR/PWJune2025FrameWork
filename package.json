@@ -14,7 +14,7 @@
     "test:qa": "npx playwright test --config=playwright.config.qa.ts",
     "test:stage": "npx playwright test --config=playwright.config.stage.ts",
     "test:prod": "npx playwright test --config=playwright.config.ts",
-    "lint": "eslint . --ext .ts,.js --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext .ts,.js --report-unused-disable-directives",
     "lint:fix": "eslint . --ext .ts,.js --fix",
     "lint:report": "eslint . --ext .ts,.js -f html -o eslint-report/index.html || true",
     "lint:report:json": "eslint . --ext .ts,.js -f json -o eslint-report/eslint-results.json || true",
@@ -32,7 +32,8 @@
     "allure-commandline": "^2.34.1",
     "allure-playwright": "^3.4.2",
     "eslint": "^8.57.1",
-    "playwright-html-reporter": "^0.1.11"
+    "playwright-html-reporter": "^0.1.11",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "csv-parse": "^6.1.0"

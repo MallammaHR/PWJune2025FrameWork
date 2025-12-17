@@ -19,7 +19,7 @@ export class ResultsPage {
     }
 
     async selectProduct(productName: string): Promise<ProductInfoPage> {
-        console.log("== product name: " + productName);
+        console.log('== product name: ' + productName);
         await this.eleUtil.click(this.page.getByRole('link', { name: productName }));
         return new ProductInfoPage(this.page);
     }

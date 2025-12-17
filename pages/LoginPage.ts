@@ -47,7 +47,7 @@ async doLogin(email :string,password :string):Promise<HomePage>
 }
 
 async getInvalidMessage():Promise<string | null>{
-    let errorMessage = await this.eleUtil.getText(this.warningMsg);
+    const errorMessage = await this.eleUtil.getText(this.warningMsg);
     console.log('invalid login warning message :' +errorMessage);
     return errorMessage;
 }
